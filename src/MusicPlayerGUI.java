@@ -11,6 +11,9 @@ public class MusicPlayerGUI extends JFrame {
     public static final Color TOOLBAR_COLOR = new Color(151, 157, 172);
     public static final Color TEXT_COLOR = new Color(224, 170, 255);
 
+    private MusicPlayer musicPlayer;
+    private JFileChooser jFileChooser;
+
     public MusicPlayerGUI() {
         super("Music Player");
 
