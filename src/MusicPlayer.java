@@ -45,6 +45,9 @@ public class MusicPlayer extends PlaybackListener {
     }
 
     public void playCurrentSong() {
+        if (currentSong == null) {
+            return;
+        }
         try {
             FileInputStream fileInputStream = new FileInputStream(currentSong.getFilePath());
             BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream);
