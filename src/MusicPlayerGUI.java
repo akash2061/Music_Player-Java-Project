@@ -1,9 +1,12 @@
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class MusicPlayerGUI extends JFrame {
 
@@ -13,6 +16,8 @@ public class MusicPlayerGUI extends JFrame {
 
     private MusicPlayer musicPlayer;
     private JFileChooser jFileChooser;
+    private JLabel songTitle, songArtist;
+    private JPanel playbackBtns;
 
     public MusicPlayerGUI() {
         super("Music Player");
@@ -23,6 +28,12 @@ public class MusicPlayerGUI extends JFrame {
         setResizable(false);
         setLayout(null);
         getContentPane().setBackground(FRAME_COLOR);
+
+        musicPlayer = new MusicPlayer();
+        jFileChooser = new JFileChooser();
+        jFileChooser.setCurrentDirectory(new File("src/assets"));
+        jFileChooser.setFileFilter(new FileNameExtensionFilter("MP3", "mp3"));
+
         addGuiComponents();
     }
 
@@ -32,14 +43,14 @@ public class MusicPlayerGUI extends JFrame {
         songImage.setBounds(20, 50, getWidth() - 40, 225);
         add(songImage);
 
-        JLabel songTitle = new JLabel("Song Title");
+        songTitle = new JLabel("Song Title");
         songTitle.setBounds(0, 285, getWidth() - 10, 35);
         songTitle.setFont(new Font("Dialog", Font.BOLD, 24));
         songTitle.setForeground(TEXT_COLOR);
         songTitle.setHorizontalAlignment(SwingConstants.CENTER);
         add(songTitle);
 
-        JLabel songArtist = new JLabel("Artist");
+        songArtist = new JLabel("Artist");
         songArtist.setBounds(0, 315, getWidth() - 10, 30);
         songArtist.setFont(new Font("Dialog", Font.PLAIN, 24));
         songArtist.setForeground(TEXT_COLOR);
@@ -69,6 +80,20 @@ public class MusicPlayerGUI extends JFrame {
         menuBar.add(songMenu);
 
         JMenuItem loadSong = new JMenuItem("Load Song");
+        loadSong.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                jFileChooser.showOpenDialog(MusicPlayerGUI.this);
+                File selectFile = jFileChooser.getSelectedFile();
+
+                if (selectFile != null) {
+                    Song song = new Song(selectFile.getPath());
+                    musicPlayer.loadSong(song);
+                    updateSongTitleAndArtist(song);
+                    enablePauseButtonDisablePlayButton();
+                }
+            }
+        });
         songMenu.add(loadSong);
 
         JMenu playlistMenu = new JMenu("PlayList");
@@ -84,7 +109,7 @@ public class MusicPlayerGUI extends JFrame {
     }
 
     private void addPlaybackBtns() {
-        JPanel playbackBtns = new JPanel();
+        playbackBtns = new JPanel();
         playbackBtns.setBounds(0, 435, getWidth() - 10, 80);
         playbackBtns.setBackground(null);
 
@@ -110,6 +135,33 @@ public class MusicPlayerGUI extends JFrame {
         playbackBtns.add(nextButton);
 
         add(playbackBtns);
+    }
+
+    private void updateSongTitleAndArtist(Song song) {
+        songTitle.setText(song.getSongTitle());
+        songArtist.setText(song.getSongArtist());
+    }
+
+    private void enablePauseButtonDisablePlayButton() {
+        JButton playButton = (JButton) playbackBtns.getComponent(1);
+        JButton pauseButton = (JButton) playbackBtns.getComponent(2);
+
+        playButton.setVisible(false);
+        playButton.setEnabled(false);
+
+        pauseButton.setVisible(true);
+        pauseButton.setEnabled(true);
+    }
+
+    private void enablePlayButtonDisablePauseButton() {
+        JButton playButton = (JButton) playbackBtns.getComponent(1);
+        JButton pauseButton = (JButton) playbackBtns.getComponent(2);
+
+        playButton.setVisible(true);
+        playButton.setEnabled(true);
+
+        pauseButton.setVisible(false);
+        pauseButton.setEnabled(false);
     }
 
     private ImageIcon loadImage(String imagePath) {
