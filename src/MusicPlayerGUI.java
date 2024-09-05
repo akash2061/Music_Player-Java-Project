@@ -77,6 +77,7 @@ public class MusicPlayerGUI extends JFrame {
                 int frame = source.getValue();
                 musicPlayer.setCurrentFrame(frame);
                 musicPlayer.setCurretTimeInMilli((int) (frame / 2.08 * musicPlayer.getCurrentSong().getFrameRatePerMilliseconds()));
+                musicPlayer.playCurrentSong();
             }
         });
         add(playbackSlider);
