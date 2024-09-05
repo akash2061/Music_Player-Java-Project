@@ -83,10 +83,10 @@ public class MusicPlayerGUI extends JFrame {
         loadSong.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                jFileChooser.showOpenDialog(MusicPlayerGUI.this);
+                int result = jFileChooser.showOpenDialog(MusicPlayerGUI.this);
                 File selectFile = jFileChooser.getSelectedFile();
 
-                if (selectFile != null) {
+                if (result == JFileChooser.APPROVE_OPTION && selectFile != null) {
                     Song song = new Song(selectFile.getPath());
                     musicPlayer.loadSong(song);
                     updateSongTitleAndArtist(song);
@@ -121,12 +121,26 @@ public class MusicPlayerGUI extends JFrame {
         JButton playButton = new JButton(loadImage("src/assets/play.png")); // Example of adding more buttons
         playButton.setBorderPainted(false);
         playButton.setBackground(null);
+        playButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                enablePauseButtonDisablePlayButton();
+                musicPlayer.playCurrentSong();
+            }
+        });
         playbackBtns.add(playButton);
 
         JButton pauseButton = new JButton(loadImage("src/assets/pause.png")); // Example of adding more buttons
         pauseButton.setBorderPainted(false);
         pauseButton.setBackground(null);
         pauseButton.setVisible(false);
+        pauseButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                enablePlayButtonDisablePauseButton();
+                musicPlayer.pauseSong();
+            }
+        });
         playbackBtns.add(pauseButton);
 
         JButton nextButton = new JButton(loadImage("src/assets/next.png"));

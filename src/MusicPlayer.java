@@ -1,12 +1,17 @@
+import javazoom.jl.player.advanced.AdvancedPlayer;
+import javazoom.jl.player.advanced.PlaybackEvent;
+import javazoom.jl.player.advanced.PlaybackListener;
+
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 
-import javazoom.jl.player.advanced.AdvancedPlayer;
-
-public class MusicPlayer {
+public class MusicPlayer extends PlaybackListener {
     private Song currentSong;
 
     private AdvancedPlayer advancePlayer;
+
+    private boolean isPaused;
+    private int currentFrame;
 
     public MusicPlayer() {
     }
@@ -18,28 +23,67 @@ public class MusicPlayer {
         }
     }
 
+    public void pauseSong() {
+        if (advancePlayer != null) {
+            isPaused = true;
+            stopSong();
+        }
+    }
+
+    public void stopSong() {
+        if (advancePlayer != null) {
+            try {
+                // Ensure the player is not null and valid before stopping
+                advancePlayer.stop();
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                advancePlayer.close();
+                advancePlayer = null;
+            }
+        }
+    }
+
     public void playCurrentSong() {
         try {
             FileInputStream fileInputStream = new FileInputStream(currentSong.getFilePath());
             BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream);
 
             advancePlayer = new AdvancedPlayer(bufferedInputStream);
+            advancePlayer.setPlayBackListener(this);
             startMusicThread();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void startMusicThread(){
+    private void startMusicThread() {
         new Thread(new Runnable() {
             @Override
-            public void run(){
+            public void run() {
                 try {
-                    advancePlayer.play();
+                    if (isPaused) {
+                        advancePlayer.play(currentFrame, Integer.MAX_VALUE);
+                    } else {
+                        advancePlayer.play();
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         }).start();
+    }
+
+    @Override
+    public void playbackStarted(PlaybackEvent evt) {
+        System.out.println("Playback Started");
+    }
+
+    @Override
+    public void playbackFinished(PlaybackEvent evt) {
+        System.out.println("Playback Finished");
+        if (isPaused) {
+            currentFrame += (int) ((double) evt.getFrame() * currentSong.getFrameRatePerMilliseconds());
+        }
     }
 }
