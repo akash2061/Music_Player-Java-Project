@@ -1,11 +1,10 @@
-import java.io.File;
-
+import com.mpatric.mp3agic.Mp3File;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.Tag;
 
-import com.mpatric.mp3agic.Mp3File;
+import java.io.File;
 
 public class Song {
     private String songTitle;
@@ -23,11 +22,13 @@ public class Song {
             songLength = convertToSongLengthFormat();
 
             AudioFile audioFile = AudioFileIO.read(new File(filePath));
+
             Tag tag = audioFile.getTag();
             if (tag != null) {
                 songTitle = tag.getFirst(FieldKey.TITLE);
                 songArtist = tag.getFirst(FieldKey.ARTIST);
             } else {
+
                 songTitle = "N/A";
                 songArtist = "N/A";
             }
@@ -40,6 +41,7 @@ public class Song {
         long minutes = mp3File.getLengthInSeconds() / 60;
         long seconds = mp3File.getLengthInSeconds() % 60;
         String formattedTime = String.format("%02d:%02d", minutes, seconds);
+
         return formattedTime;
     }
 
